@@ -1,0 +1,180 @@
+{% extends "Game/base.html" %}
+{% block content%}
+    <div class="w3-row-padding">    
+        <div class="w3-col w3-section">
+            <div class="w3-container w3-card w3-theme-d1 w3-center">
+                <H1>Country</H1>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-row-padding">
+        <div class="w3-col l4 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                
+                <div class="w3-container">
+                    <H2>Country Information</H2>
+                </div>
+
+                <!-- Progress bars-->
+                <div class="w3-container">
+                    
+                    <!-- World View-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">National</div>
+                            <div class="w3-display-middle"><b>World view</b></div>
+                            <div class="w3-display-right w3-hide-small">Global</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Worldview_bar}}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Nature-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">Preservation</div>
+                            <div class="w3-display-middle"><b>Nature</b></div>
+                            <div class="w3-display-right w3-hide-small">Exploitation</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Nature_bar}}%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ethics-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">Conservative</div>
+                            <div class="w3-display-middle"><b>Ethics</b></div>
+                            <div class="w3-display-right w3-hide-small">Liberal</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Ethics_bar}}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Taxation-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">Higher</div>
+                            <div class="w3-display-middle"><b>Taxation</b></div>
+                            <div class="w3-display-right w3-hide-small">Lower</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Taxation_bar}}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Social Protection-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">Government</div>
+                            <div class="w3-display-middle"><b>Social Protection</b></div>
+                            <div class="w3-display-right w3-hide-small">Free Market</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Social_protection_bar}}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Immigration-->
+                    <div class="w3-container w3-section">
+                        <div class="w3-display-container" style="height:40px">
+                            <div class="w3-display-left w3-hide-small">Close border</div>
+                            <div class="w3-display-middle"><b>Immigration</b></div>
+                            <div class="w3-display-right w3-hide-small">Shelter</div>
+                        </div>
+
+                        <div class="w3-border w3-theme-l3">
+                            <div class="w3-theme-d3" style="height:24px; width:{{General.Immigration_bar}}%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Political orientation on axes-->
+        <div class="w3-col l2 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h2 class="w3-text-white">Current Policies</h2>
+                <p class="w3-text-white">Left-Right: {{ General.LR }} </p>
+                <p class="w3-text-white">Conservative-Progressive: {{ General.CP }} </p>
+
+                <div class="w3-container w3-hide-medium w3-theme-l1" style="width:100%; height:200px">
+                    <div class="w3-display-container" style="width:100%; height:100%">
+                        <img src="http://www.zefdamen.nl/CropCircles/Reconstructions/2012/CheesefootHead12/cheesefoothead01.gif" class="w3-display-middle" alt="No" style="height:100%">
+                        <div class="w3-display-topleft w3-rightbar w3-border-red" style="width:{{ General.LR_bar }}%; height:100%"></div>
+                        <div class="w3-display-topleft w3-bottombar w3-border-red" style="width:100%; height:{{ General.CP_bar }}%"></div>
+                    </div>
+                </div>
+    
+                <div class="w3-container w3-hide-large w3-hide-small w3-theme-l1" style="width:100%; height:500px">
+                    <div class="w3-display-container" style="width:100%; height:100%">
+                        <img src="http://www.zefdamen.nl/CropCircles/Reconstructions/2012/CheesefootHead12/cheesefoothead01.gif" class="w3-display-middle" alt="No" style="height:100%">
+                        <div class="w3-display-topleft w3-rightbar w3-border-red" style="width:{{ General.LR_bar }}% ; height:100%"></div>
+                        <div class="w3-display-topleft w3-bottombar w3-border-red" style="width:100%; height:{{ General.CP_bar }}%"></div>
+                    </div>
+                </div>
+                <br>
+            </div>
+
+        </div>
+    
+        <!--List of Counties-->
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h2>Counties</h2>
+                {% for county in Counties %}
+                    <div class="w3-container w3-padding w3-border-bottom"">
+                        <a href="{% url 'detail_counties' county.id %}">{{ county.Name }}</a> <br>
+                        <a href="{% url 'detail_parties' county.Representative.Party.id %}">({{ county.Representative.Party.Name }}</a> ,
+                        <a href="{% url 'detail_representatives' county.Representative.id %}">{{ county.Representative.Name }}</a>) 
+                    </div>
+                {% endfor %}
+                <br>
+            </div>
+        </div>
+
+        <!--List of Parties-->
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h2>Parties</h2>
+                {% for party in Parties %}
+                    <div class="w3-container w3-padding w3-hover-green">
+                        <a href="{% url 'detail_parties' party.id %}">{{ party.Name }}</a> ({{ party.Seats }}) <br>
+                    </div>
+                {% endfor %}
+                <br>
+            </div>
+        </div>
+    
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <br>
+        <input type="Submit" name="Test" value="Test">
+
+        {% if General.Test == True %}
+            <input type="submit" name="Reset" value="Reset">
+            <input type="submit" name="Next_action" value="Next_action">
+                {% for party in Parties %}
+                    {% if request.user == party.User %}
+                        <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                    {% endif %}
+                {% endfor %}
+            <input type="submit" name="Force_next_action" value="Force_next_action">
+        {% endif %}
+    </form>
+
+
+{% endblock content %}

@@ -1,0 +1,312 @@
+{% extends "Game/base.html" %}
+{% block content%}
+    <div class="w3-row-padding">    
+        <div class="w3-col w3-section">
+            <div class="w3-container w3-card w3-theme-d1 w3-center">
+                <H1>Parliament</H1>
+            </div>
+        </div>
+    </div>    
+
+    <div class="w3-row-padding">
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Seats</h3>
+
+                <div class="w3-container w3-margin">
+                    {% for party in Parties %}
+                        <div class="w3-container w3-padding w3-hover-green">
+                            <a href="{% url 'detail_parties' party.id %}">{{ party.Name }}</a> ---> <b>{{ party.Seats }}</b>
+                            <br>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <br>
+
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Proposals year {{ General.Year }}</h3>
+
+                {% if General.Next_action == "Discuss proposals" or General.Next_action == "Study outcome" or General.Test == True %}
+                    {% for proposal in Current_proposals %}
+                        <div class="w3-container w3-margin-bottom">
+                            Proposal #{{ proposal.Current_proposal_number }}:<br>
+                            {{ proposal.Proposal }}
+                        </div>  
+                    {% endfor %}
+                {% else%}
+                    <div class="w3-container w3-margin">
+                        When parliament is in session policy proposals will be presented here.
+                    </div>
+                {% endif %}
+                    
+                {% if General.Test == True %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <br>
+                        <input type="submit" name="Select_three_new_proposals" value="Select_three_new_proposals">
+                        <input type="submit" name="Non_user_vote_selections" value="Non_user_vote_selections">
+                    </form>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Political deals</h3>
+                {% for turnparty in Parties %}
+                    {% if General.Next_action == "Discuss proposals" and turnparty.User == request.user and turnparty.Turn == "Now" %}
+                        <form class="w3-container w3-margin w3-border w3-border-white w3-theme-d1" method="POST">
+                        {% csrf_token %}
+                            {% for party in Parties %}
+                                {% if request.user == party.User %}
+                                    <input type="hidden" value="{{ party.Name }}" name="party_name">
+                                {% endif %}
+                            {% endfor %}
+
+                            Which party do you want to make a deal with?<br>
+                            <select class="w3-container w3-margin" name="other_party">
+                                {% for party in Parties %}
+                                    {% if party.User == None %}
+                                        <option value="{{ party.Name }}">{{ party.Name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select><br><br>
+                            
+                            How do you propose to vote?<br>
+                            <table class="w3-table">
+                                <tr>
+                                    <th></th>
+                                    <th class="w3-center">You</th>
+                                    <th class="w3-center">Other party</th>
+                                </tr>
+                                <tr>
+                                    <td class="w3-center"">#1:</td>
+                                    <td>
+                                        <select class="w3-container" name="Deal_proposal_1_user">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="w3-container"  name="Deal_proposal_1_other">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="w3-center">#2:</td>
+                                    <td>
+                                        <select class="w3-container" name="Deal_proposal_2_user">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="w3-container"  name="Deal_proposal_2_other">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="w3-center">#3:</td>
+                                    <td>
+                                        <select class="w3-container" name="Deal_proposal_3_user">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="w3-container"  name="Deal_proposal_3_other">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <input class="w3-btn w3-margin w3-round w3-theme-l1" type="submit" name="Propose deal" value="Propose deal">
+                        </form>
+
+                        {% for party in Parties %}
+                            {% if request.user == party.User %}
+                                <div class="w3-container w3-margin">
+                                    {{ party.Message_proposal_deal }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    {% elif turnparty.User == request.user %}
+                        <div class="w3-container w3-margin">
+                            When your party is in the phase of discussing proposals you can use this window to make a deal with other parties.
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                    
+                {% for deal in Deals %}
+                    {% if request.user == deal.User and deal.Current == True %}
+                        <div class="w3-container w3-card w3-theme-l2 w3-margin w3-border ">
+                            Deal with {{ deal.Other_party }}
+
+                            <table class="w3-table">
+                                <tr>
+                                    <th></th>
+                                    <th>#1</th>
+                                    <th>#2</th>
+                                    <th>#3</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ deal.User_party }}</td>
+                                    <td>{{ deal.Promised_vote_proposal_1 }}</td>
+                                    <td>{{ deal.Promised_vote_proposal_2 }}</td>
+                                    <td>{{ deal.Promised_vote_proposal_3 }}</td>
+                                </tr>
+                                {% for party in Parties %}
+                                    {% if party.Name == deal.Other_party %}
+                                        <tr>
+                                            <td>{{ party.Name }}</td>
+                                            <td>{{ party.Vote_proposal_1 }}</td>
+                                            <td>{{ party.Vote_proposal_2 }}</td>
+                                            <td>{{ party.Vote_proposal_3 }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <div class="w3-col l2 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Cast your vote</h3>
+                
+                <!-- This form can be used by a logged in user to save his vote-->
+                {% if General.Next_action == "Discuss proposals" %}
+                    {% for party in Parties %}
+                        {% if request.user == party.User and party.Turn == "Now"%}
+                            <form class="w3-container w3-margin w3-border w3-border-white w3-theme-d1" method="POST">
+                            {% csrf_token %}
+                                <br>
+                                <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                #1:
+                                <select class="w3-container" name="Vote_proposal_1">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select><br><br>
+                                #2:
+                                <select class="w3-container" name="Vote_proposal_2">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select><br><br>
+                                #3:
+                                <select class="w3-container" name="Vote_proposal_3">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select><br><br>
+
+                                <input class="w3-btn w3-margin w3-round w3-theme-l1" type="submit" name="Save" value="Save">
+                            </form>
+                            
+                            {% if party.Next_action == 1  %}
+                                <div class="w3-container w3-margin">
+                                    Choice has been saved:<br>
+                                    #1: {{ party.Vote_proposal_1 }}<br>
+                                    #2: {{ party.Vote_proposal_2 }}<br>
+                                    #3: {{ party.Vote_proposal_3 }}<br>
+                                </div>
+                            {% endif %}
+                        {% elif request.user == party.User %}
+                            <div class="w3-container w3-margin">
+                                When you are in the phase of discussing proposals you can use this window to cast your vote.
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if General.Test == True %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <br>
+                        <input type="submit" name="Deal_check" value="Deal_check">
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="w3-col l4 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Vote</h3>
+                {% if General.Next_action == "Study outcome" %}
+                    <div class="w3-container w3-margin w3-border w3-border-white w3-theme-d1">
+                        <H3>Voting results</H3>
+                        <table class="w3-table">
+                            <tr>
+                                <th></th>
+                                <th>#1</th>
+                                <th>#2</th>
+                                <th>#3</th>
+                            </tr>
+                            {% for party in Parties %}
+                                <tr>
+                                    <td>{{ party.Name }} ({{ party.Seats }})</td>
+                                    <td>{{ party.Vote_proposal_1 }}</td>
+                                    <td>{{ party.Vote_proposal_2 }}</td>
+                                    <td>{{ party.Vote_proposal_3 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <div class="w3-container w3-margin">
+                        #1 {{ General.Message_outcome_proposal_1 }}<br>
+                        #2 {{ General.Message_outcome_proposal_2 }}<br>
+                        #3 {{ General.Message_outcome_proposal_3 }}
+                    </div>
+
+                    {% for turnparty in Parties %}
+                        {% if turnparty.User == request.user and turnparty.Turn == "Now" %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input class="w3-btn w3-margin w3-round w3-theme" type="submit" name="Continue" value="Continue">
+
+                                <!-- We identify the current party so Next_action() can be called -->
+                                {% for party in Parties %}
+                                    {% if request.user == party.User %}
+                                        <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                    {% endif %}
+                                {% endfor %}
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="w3-container w3-margin">
+                        After voting the outcome will be displayed here.
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>   
+
+    </div>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}

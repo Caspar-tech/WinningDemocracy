@@ -1,0 +1,63 @@
+{% extends "Game/base.html" %}
+{% block content%}
+    <div class="w3-container w3-card w3-theme-d1 w3-center w3-section">    
+        <h1>{{ PartiesDetail.Name }}</h1>
+    </div>
+
+    <div class="w3-row-paddding">
+
+        <div class="w3-col l6 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-margin-right">
+                <H3>Ideology</H3>
+                <div class="w3-container w3-margin-left">
+                    Left-Right: {{ PartiesDetail.LR }} <br>
+                    Conservative-Progressive: {{ PartiesDetail.CP }} <br>
+                </div>
+
+                <H3>Party Members</H3>
+                <!-- We use extra context from Repr-model to show if an representative is member of a party --->
+                <div class="w3-container w3-margin-bottom">
+                    {% for representative in Representatives %}
+                        {% if representative.Party == PartiesDetail %}
+                            <div class="w3-container w3-hover-green">
+                                <a href="{% url 'detail_representatives' representative.id %}">{{ representative.Name }} </a><br>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <H3>Seats</H3>
+                <div class="w3-container w3-margin-bottom">
+                    Number of seats in parliament: {{ PartiesDetail.Seats}}
+                </div>
+
+                {% if PartiesDetail.Deal_breaker == True %}
+                    <H3>Deal breaker</H3>
+                    <div class="w3-container w3-margin-left w3-margin-bottom">
+                        This party is known for breaking a promised deal. Other parties will be very reluctant to accept new deals from this party.
+                    </div>    
+                {% endif %}
+
+            </div>
+        </div>
+
+        {% if request.user == PartiesDetail.User %}
+            <div class="w3-col l6 w3-section">
+                <div class="w3-container w3-card w3-theme-l1 w3-center">
+                    <H3>Phases and actions</H3>
+                    - Submit candidates <br>
+                    - Hold elections <br>
+                    - Propose declaration <br>
+                    - Form government <br>
+                    - Discuss proposals <br>
+                    - Hold vote <br>
+                    - Study outcome<br>
+                </div>
+            </div>
+        {% else %}
+            <div class="w3-col l6 w3-section"></div>
+        {% endif %}
+
+    </div>
+
+{% endblock content %}

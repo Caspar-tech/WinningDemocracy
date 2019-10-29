@@ -1,0 +1,160 @@
+{% extends "Game/base.html" %}
+{% block content%}
+
+    <div class="w3-row-padding">    
+        <div class="w3-col w3-section">
+            <div class="w3-container w3-card w3-theme-d1 w3-center">
+                <H1>Elections</H1>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-row-padding">
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Candidate submit form</h3>
+
+                    {% if General.Test == True %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <br>
+                            <input type="submit" name="Non_user_candidate_selection" value="Non_user_candidate_selection">
+                        </form>
+                    {% endif %}
+                    
+                    {% for turnparty in Parties %}
+                        {% if General.Next_action == 'Submit candidates' and turnparty.User == request.user and turnparty.Turn == "Now" %}
+                            <!-- This form can be used by the logged in user to submit his candidates for county elections-->
+                            {% if user.is_authenticated %}
+
+                            <form class="w3-container w3-margin w3-border w3-border-white w3-theme-d1" method="POST">
+                                {% csrf_token %}
+                                <br>
+                                {% for county in Counties %}
+                                    <div class="w3-container w3-padding-small">
+                                    <a href="{% url 'detail_counties' county.id %}">{{ county.Name }} </a><br>
+
+                                    {% for party in Parties %}
+                                        {% if party.User == request.user %}
+                                            <select class="w3-container" name="{{ county.Name }}">
+                                                {% for representative in Representatives %}
+                                                    {% if party == representative.Party %}
+                                                        {% if representative.County_election == county.Name %}
+                                                            <option value="{{ representative.Name }}">{{ representative.Name }}</option>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <option value="">---</option>
+                                                {% for representative in Representatives %}
+                                                    {% if party == representative.Party and representative.County_election != county.Name%}
+                                                        <option value="{{ representative.Name }}">{{ representative.Name }}</option>                 
+                                                    {% endif %}
+                                                {% endfor %} 
+                                            </select>
+
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
+                                {% endfor %}
+                                <div class="w3-container w3-padding">{{ General.Message_elections_page }}</div>
+                                
+                                <!-- We identify the current party so Next_action() can be called -->
+                                {% for party in Parties %}
+                                    {% if request.user == party.User %}
+                                        <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <input class="w3-btn w3-margin w3-round w3-theme-l1" type="submit" name="Save" value="Save">
+                                </form>
+                            {% endif %}
+
+                        {% elif turnparty.User == request.user %}
+                            <div class="w3-container w3-section">
+                                This form is available in the candidate submit phase of your party
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Selected candidates</h3>
+
+                {% for county in Counties%}
+                    <div class="w3-container w3-padding w3-border-bottom">
+                        <b>{{ county.Name }} | </b>
+                        {% for representative in Representatives %}
+                            <!-- we only show which candidates other parties have selected after all users have
+                            selected their candidates. -->
+                            {% if General.Next_action == "Submit candidates" and General.Test == False %}
+                                {% if representative.County_election == county.Name and representative.Party.User == request.user %}
+                                    <a href="{% url 'detail_representatives' representative.id %}">{{ representative.Name }}</a>
+                                    ({{ representative.Party }})
+                                {% endif %}
+                            {% else %}
+                                {% if representative.County_election == county.Name %}
+                                    <a href="{% url 'detail_representatives' representative.id %}">{{ representative.Name }}</a>
+                                    ({{ representative.Party }})
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <br>
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                    <h3>Campaign</h3>
+                    <div class="w3-container w3-section">
+                        This feature is not available yet.
+                    </div>
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                    <h3>Election day</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% for turnparty in Parties %}
+                            {% if General.Next_action == 'Hold elections' and turnparty.User == request.user and turnparty.Turn == "Now" %}
+                                <input class="w3-btn w3-margin w3-round w3-theme" type="submit" name="Hold elections" value="Hold elections">
+                                <div class="w3-container w3-section">
+                                    (Holding elections will take a few moments)
+                                </div>
+                            {% elif turnparty.User == request.user %}
+                                <div class="w3-container w3-section">
+                                    Elections can be initiated in the hold elections phase
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- We identify the current party so Next_action() can be called -->
+                        {% for party in Parties %}
+                            {% if request.user == party.User %}
+                                <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                            {% endif %}
+                        {% endfor %}
+                        
+                    </form>
+                    {% if General.Next_action != "Hold elections" and General.Next_action != "Submit candidates" %}
+                        {% for party in Parties %}
+                            <div class="w3-container w3-padding w3-hover-green">
+                                <a href="{% url 'detail_parties' party.id %}">{{ party.Name }}</a> ({{ party.Seats }}) <br>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+            </div>
+        </div>
+    
+    </div>
+    
+
+{% endblock content %}

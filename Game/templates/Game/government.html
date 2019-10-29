@@ -1,0 +1,273 @@
+{% extends "Game/base.html" %}
+{% block content%}
+
+    <div class="w3-row-padding">    
+        <div class="w3-col w3-section">
+            <div class="w3-container w3-card w3-theme-d1 w3-center">
+                <H1>Government</H1>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-row-padding">
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Election result</h3>
+
+                <div class="w3-container w3-margin">
+                    In order of most seats, parties may propose a declaration to form a government 
+                </div>
+
+                <div class="w3-container w3-margin">
+                    {% for party in Parties %}
+                        <div class="w3-container w3-padding w3-hover-green">
+                            <a href="{% url 'detail_parties' party.id %}">{{ party.Name }}</a> <b>({{ party.Seats }})</b>
+                            {% if party.Declaration_maker == "Failed" %}
+                            <br>--> Attempt failed
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="w3-container">
+                    {% for party in Parties %}
+                        {% if party.Declaration_maker == "Yes" and General.Next_action == "Propose declaration" %}
+                            {{ party.Name }} may propose a government declaration
+                        {% endif %}
+
+                        <!-- If the declaration maker is a non-user a "continue" button will be visible -->
+                        {% if party.Turn == "Now" and request.user == party.User and party.Declaration_maker != "Yes" and General.Next_action == "Propose declaration" %}
+                        <form method="POST">
+                            {% csrf_token %}
+                                <input class="w3-btn w3-margin w3-round w3-theme" type="submit" name="Continue" value="Continue">
+                                <!-- We identify the current party so Next_action() can be called -->
+                                {% for party in Parties %}
+                                    {% if request.user == party.User %}
+                                        <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                    {% endif %}
+                                {% endfor %}
+                            </form>
+                        {% endif %}
+
+                    {% endfor %}
+                </div>
+
+                <form method="POST">
+                {% csrf_token %}
+                    <br>
+                    {% if General.Test == True %}
+                        <input type="submit" name="Appoint_declaration_maker" value="Appoint_declaration_maker">
+                    {% endif %}
+                </form>
+                
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Government declaration</h3>
+                
+                <div class="w3-container w3-margin">
+                    When it is your parties turn to propose a declaration, a form will appear to draft your proposal. 
+                </div>
+                
+                {% for party in Parties %}
+                    {% if party.User == request.user and party.Turn == "Now" and party.Declaration_maker == "Yes" and General.Next_action == "Propose declaration" %} 
+                        <form class="w3-container w3-margin w3-border w3-border-white w3-theme-d1" method="POST">
+                            {% csrf_token %}
+                            <br>
+                            <div class="w3-container">
+                                <div class="w3-container">
+                                    Worldview:
+                                </div>
+                                <select name="Worldview" style="width:200px">
+                                    <option class="w3-container" value="More national">More national</option>
+                                    <option class="w3-container" value="More global">More global</option>
+                                </select>
+                            </div>
+
+                            <div class="w3-container" >
+                                <div class="w3-container">
+                                    Nature:
+                                </div>
+                                <select name="Nature" style="width:200px">
+                                    <option class="w3-container" value="More preservation">More preservation</option>
+                                    <option class="w3-container" value="More exploitation">More exploitation</option>
+                                </select>
+                            </div>
+
+                            <div class="w3-container">
+                                <div class="w3-container">    
+                                    Ethics:
+                                </div>
+                                <select name="Ethics" style="width:200px">
+                                    <option class="w3-container" value="More conservative">More conservative</option>
+                                    <option class="w3-container" value="More liberal">More liberal</option>
+                                </select>
+                            </div>
+
+                            <div class="w3-container">
+                                <div class="w3-container">
+                                    Taxation:
+                                </div>
+                                <select name="Taxation" style="width:200px">
+                                    <option class="w3-container" value="Higher taxes">Higher taxes</option>
+                                    <option class="w3-container" value="Lower taxes">Lower taxes</option>
+                                </select>
+                            </div>
+
+                            <div class="w3-container">
+                                <div class="w3-container">
+                                    Social protection:
+                                </div>
+                                <select name="Social_protection" style="width:200px">
+                                    <option class="w3-container" value="More government">More government</option>
+                                    <option class="w3-container" value="More free market">More free market</option>
+                                </select>
+                            </div>
+
+                            <div class="w3-container">
+                                <div class="w3-container">
+                                    Immigration:
+                                </div>
+                                <select name="Immigration" style="width:200px">
+                                    <option class="w3-container" value="More closed borders">More closed borders</option>
+                                    <option class="w3-container" value="More shelter">More shelter</option>
+                                </select>
+                            </div>
+
+                            <!-- We identify the current party so Next_action() can be called -->
+                            {% for party in Parties %}
+                                {% if request.user == party.User %}
+                                    <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                {% endif %}
+                            {% endfor %}
+
+                            <input class="w3-btn w3-margin w3-round w3-theme-l1" type="submit" name="Propose declaration" value="Propose declaration">
+                        </form>
+                    {% endif %}
+                {% endfor %}
+            
+            </div>
+        </div>
+    
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Proposed declaration</h3>
+                {% if General.Next_action != "Propose declaration" %}
+                    {% for party in Parties %}
+                        {% if party.Declaration_maker == "Yes" %}
+                            By: <b>{{ party.Name }} </b>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="w3-container w3-margin-top">
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Worldview</u> <br>
+                            {{ General.Worldview_govt }}
+                        </div> 
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Nature</u> <br>
+                            {{ General.Nature_govt }}
+                        </div>
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Ethics</u><br>
+                            {{ General.Ethics_govt }} 
+                        </div>
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Taxation</u><br>
+                            {{ General.Taxation_govt }} 
+                        </div>
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Social protection</u><br>
+                            {{ General.Social_protection_govt }} 
+                        </div>
+                        <div class="w3-container w3-margin-bottom">
+                            <u>Immigration</u><br>
+                            {{ General.Immigration_govt }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if General.Next_action == "Form government"%}
+                    {% for party in Parties %}
+                        {% if party.User == request.user and party.Turn == "Now" %}
+                        <div class="w3-container">
+                            <form class="w3-container w3-margin w3-border w3-border-white w3-theme-d1" method="POST">
+                            {% csrf_token %}
+                                <div class="w3-container w3-margin-top">    
+                                    Do you accept the declaration and thereby join the government?
+                                </div>
+                                <div class="w3-container w3-padding">     
+                                    <input type="hidden" value="{{ party.Name }}" name="party_name">
+                                    <select class="w3-container" name="Declaration_reaction">
+                                        <option value="Accepts">Accept</option>
+                                        <option value="Rejects">Reject</option>
+                                    </select>
+                                </div>
+
+                                <!-- We identify the current party so Next_action() can be called -->
+                                {% for party in Parties %}
+                                    {% if request.user == party.User %}
+                                        <input type="hidden" value="{{ party.Name }}" name="Party_name">
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="w3-container">
+                                    <input class="w3-btn w3-margin w3-round w3-theme-l1" type="submit" name="Save" value="Save">
+                                </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                   
+            </div>
+        </div>
+
+        <div class="w3-col l3 w3-section">
+            <div class="w3-container w3-card w3-theme-l1 w3-center">
+                <h3>Reaction to declaration</h3>
+
+                <div class="w3-container w3-margin">
+                    {% for party in Parties %}
+                        <div class="w3-container w3-padding w3-hover-green">
+                            <a href="{% url 'detail_parties' party.id %}">{{ party.Name }}</a> ---> 
+                            {% if General.Next_action != "Form government" %}
+                                <b>{{ party.Declaration_reaction }}</b>
+                            {% endif %}
+                            <br>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if General.Next_action != "Form government" %}
+                    <div class="w3-container w3-margin">
+                        Votes in favor: {{ General.Votes_for_declaration }}<br>
+                        Votes against: {{ General.Votes_against_declaration }}<br>
+                        {% if General.Status_forming_government == "Succes" %}
+                            <br>The declaration is <b>accepted</b>. A government is formed.
+                        {% elif General.Status_forming_government == "Failed" %}
+                            <br>The declaration has <b>no majority</b>. All parties have tried and failed.
+                        {% else %}
+                            <br>The declaration has <b>no majority</b>. The next party may try to form a governmment.
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <br>
+                    {% if General.Test == True %}
+                        <input type="submit" name="Proposed_declaration_reaction" value="Proposed_declaration_reaction">
+                    {% endif %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends "Game/base.html" %}
+{% block content %}
+    <div class="w3-row-padding">    
+        <div class="w3-col w3-section">
+            <div class="w3-container w3-card w3-theme-d1 w3-center">
+                <H1>Login</H1>
+            </div>
+        </div>
+    </div> 
+
+    <form class="w3-container w3-card w3-margin w3-padding w3-theme-l1" method="POST" style="width:220px">
+        {% csrf_token %}
+            <br>
+            {{ form }}
+            <div>
+                <button class="w3-btn w3-margin w3-round w3-theme" type="submit">Login</button>
+            </div>
+
+            <a class="w3-btn w3-round w3-margin-left w3-margin-bottom w3-theme" href="{% url 'register' %}">Register</a>
+    </form>
+
+{% endblock content%}

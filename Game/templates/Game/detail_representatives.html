@@ -1,0 +1,32 @@
+{% extends "Game/base.html" %}
+{% block content%}
+    <div class="w3-container w3-card w3-theme-d1 w3-center w3-section">    
+        <h1>{{ Representatives.Name }}</h1>
+    </div>
+
+    <div class="w3-row-paddding">
+
+        <div class="w3-col l6 w3-section">
+            <div class="w3-container w3-card w3-theme-l1">
+
+                <H3>Ideology</H3>
+                <div class="w3-container w3-margin-left">
+                    Left-Right: {{ Representatives.LR }} <br>
+                    Conservative-Progressive: {{ Representatives.CP }} <br>
+                </div>
+
+                <H3>Public Office</H3>
+                <div class="w3-container w3-margin-bottom">
+                    {% for county in Counties %}
+                        {% if county.Representative == Representatives %}
+                            <div class="w3-container w3-hover-green">
+                                <a href="{% url 'detail_counties' county.id %}">{{ county.Name }}</a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+            </div>  
+        </div>
+    </div>
+{% endblock content %}
