@@ -8,11 +8,19 @@
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-green.css">
     <title></title>
 </head>
+<style>
+    .underline {
+        text-decoration: underline;
+    }
+</style>
 <body class="w3-theme-l5">
     
     <div class="w3-bar w3-card w3-theme w3-top">
 
-        <a href="{% url 'main' %}" class="w3-bar-item w3-button">Country</a>
+        {% url 'main' as main %}
+        <a href="{% url 'main' %}" class="{% if request.path == main %} w3-bar-item w3-button underline
+                                                                        {% else %} w3-bar-item w3-button
+                                                                       {% endif %}"> Country </a>
         
         {% for party in Parties %}
             {% if party.User ==  request.user %}
@@ -20,9 +28,20 @@
             {% endif %}
         {% endfor %}
 
-        <a href="{% url 'elections' %}" class="w3-bar-item w3-button"> Elections </a>
-        <a href="{% url 'government' %}" class="w3-bar-item w3-button"> Government </a>
-        <a href="{% url 'parliament' %}" class="w3-bar-item w3-button"> Parliament </a>
+        {% url 'elections' as elections %}
+        {% url 'government' as government %}
+        {% url 'parliament' as parliament %}
+        <a href="{% url 'elections' %}" class="{% if request.path == elections %} w3-bar-item w3-button underline
+                                                                        {% else %} w3-bar-item w3-button
+                                                                       {% endif %}"> Elections </a>
+
+        <a href="{% url 'government' %}" class="{% if request.path == government %} w3-bar-item w3-button underline
+                                                                        {% else %} w3-bar-item w3-button
+                                                                       {% endif %}"> Government </a>
+
+        <a href="{% url 'parliament' %}" class="{% if request.path == parliament %} w3-bar-item w3-button underline
+                                                                        {% else %} w3-bar-item w3-button
+                                                                       {% endif %}"> Parliament </a>
 
         {% if user.is_authenticated %}
             <a href="{% url 'logout'%}" class="w3-bar-item w3-button">Logout</a>
@@ -41,12 +60,53 @@
     <br>
     <br>
     <div class="w3-container w3-card w3-theme w3-bottom w3-padding">
-        <span>Next action: {{ General.Next_action }}</span>
+        <!-- We make a permanent link at the bottom of the page to the
+        sub-website where the next action by the player should be taken -->
+        <span>Next action:
+        {% if General.Next_action == "Submit candidates" %}
+            <a href="{% url 'elections' %}">{{ General.Next_action }} </a>
+        {% elif General.Next_action == "Hold elections" %}
+            <a href="{% url 'elections' %}">{{ General.Next_action }} </a>
+        {% elif General.Next_action == "Propose declaration" %}
+            <a href="{% url 'government' %}">{{ General.Next_action }} </a>
+        {% elif General.Next_action == "Form government" %}
+            <a href="{% url 'government' %}">{{ General.Next_action }} </a>
+        {% elif General.Next_action == "Discuss proposals" %}
+            <a href="{% url 'parliament' %}">{{ General.Next_action }} </a>
+        {% elif General.Next_action == "Study outcome" %}
+            <a href="{% url 'parliament' %}">{{ General.Next_action }} </a>
+        {% endif %}
+        </span>
+
+        <!-- now we add the name of the party which turn it is -->
+        <!-- If it is the current player his turn, this will be shown in bold red instead of the party -->
+        <!-- by enabling the script the browser will check for updates in regular intervals, disadvantage
+            is that the screen will be renewed at the top so any scrolling down will be undone -->
         {% for party in Parties %}
             {% if party.Turn == "Now" %}
-                ({{ party.Name }})
+                {% if party.User ==  request.user %}
+                    <span style="color:red"><b>(Your Action)</b></span>
+                {% else %}
+                    ({{ party.Name }})
+                    <!--<script>
+                        myVar = setInterval(myRefresh, 5000);
+
+                        function myRefresh() {
+                            window.location.replace(window.location.pathname + window.location.search + window.location.hash);
+                        }
+                    </script>-->
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>
+
+    <!-- This scripts prevents the browser to use the return button,
+    this prevents the user from eg. filling out a form again which he already filled out -->
+    <script type = "text/javascript" >
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+
+    </script>
 </body>
 </html>
