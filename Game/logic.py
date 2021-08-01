@@ -160,7 +160,7 @@ def Save_user_candidates(FormInput):
     # If no candidates were used double we give a succes message
     if Double_candidate == False:
             Game1 = General.objects.get(Name="Game1")
-            Game1.Message_elections_page = "You succesfully saved your candidate list"
+            Game1.Message_elections_page = ""
             Game1.save()
 
 # This functions selects for non-user parties which repr.'s will take part in which county elections

@@ -1,0 +1,5 @@
+Future improvements
+- Get rid of message system trough database General. Instead connect all message to the user and make all messages show at the bottom.
+- create tickbox in upper bar to refresh page when waiting for other player
+- Reaction to declaration shows independent opinion even though it as 0 seats
+- After striking a deal in political deals the message on the page still shows the old message that the other party does not want a deal
